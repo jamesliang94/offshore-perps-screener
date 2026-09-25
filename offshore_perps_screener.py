@@ -96,6 +96,29 @@ def uphold():
     return {norm(a["code"]) for a in get("https://api.uphold.com/v0/assets") if a.get("code")}
 
 
+def coinbase_us_perps():
+    """Coins with a US-regulated perpetual-style future on Coinbase Derivatives (CDE)."""
+    from datetime import datetime, timezone
+    data = get("https://api.coinbase.com/api/v3/brokerage/market/products"
+               "?product_type=FUTURE&limit=1000")
+    out = set()
+    now_year = datetime.now(timezone.utc).year
+    for prod in data.get("products", []):
+        d = prod.get("future_product_details") or {}
+        if (d.get("venue") or "").lower() not in ("cde", ""):
+            continue
+        name = (d.get("display_name") or prod.get("display_name") or "").upper()
+        expiry = d.get("contract_expiry") or ""
+        # Perp-style contracts are ~5-year dated futures or labeled PERP
+        is_perp_style = "PERP" in name or (expiry[:4].isdigit() and int(expiry[:4]) >= now_year + 3)
+        if not is_perp_style:
+            continue
+        root = d.get("contract_root_unit") or prod.get("base_display_symbol") or ""
+        if root:
+            out.add(norm(root))
+    return out
+
+
 US_EXCHANGES = [  # (name, column label, loader)
     ("Coinbase", "CB", coinbase),
     ("Kraken", "KRK", kraken),
@@ -154,6 +177,13 @@ def main():
             failed.append(name)
             print(f"WARNING: couldn't load {name}: {e}")
 
+    try:
+        us_perps = coinbase_us_perps()
+        print(f"Loaded {len(us_perps):>5} coins with US perp-style futures (Coinbase Derivatives)")
+    except Exception as e:
+        us_perps = None
+        print(f"WARNING: couldn't load Coinbase Derivatives perps: {e}")
+
     coins, venues_seen = offshore_perps()
     print(f"\nPerp venues scanned: {', '.join(sorted(venues_seen)) or 'none found'}")
     print(f"Threshold: ${MIN_VOLUME_USD/1e6:,.0f}M 24h volume on at least one venue")
@@ -171,6 +201,7 @@ def main():
             "venues": ", ".join(f"{v} {vol/1e6:,.0f}" for v, vol in sorted(venues.items(), key=lambda x: -x[1])),
             "flags": flags,
             "us_count": sum(f == "Y" for f in flags.values()),
+            "us_perp": "?" if us_perps is None else ("Y" if base in us_perps else "-"),
         })
     rows.sort(key=lambda r: r["top_vol"], reverse=True)
 
@@ -179,18 +210,20 @@ def main():
         if not subset:
             print("(none)\n")
             return
-        print(f"{'Coin':<10}{'Top vol $M':>11}  " + "".join(f"{l:>5}" for l in labels) + f"{'#US':>5}   Venues (vol $M)")
+        print(f"{'Coin':<10}{'Top vol $M':>11}  " + "".join(f"{l:>5}" for l in labels) + f"{'#US':>5}{'USPERP':>8}   Venues (vol $M)")
         for r in subset:
             print(f"{r['base']:<10}{r['top_vol']/1e6:>11,.0f}  "
                   + "".join(f"{r['flags'][l]:>5}" for l in labels)
-                  + f"{r['us_count']:>5}   {r['venues']}")
+                  + f"{r['us_count']:>5}{r['us_perp']:>8}   {r['venues']}")
         print()
 
-    table("NOT listed on any US exchange checked", [r for r in rows if r["us_count"] == 0])
+    table("NO US perp-style futures (offshore-only perps)", [r for r in rows if r["us_perp"] == "-"])
+    table("NOT listed on any US exchange checked (spot)", [r for r in rows if r["us_count"] == 0])
     table("Listed on only 1-2 US exchanges", [r for r in rows if 1 <= r["us_count"] <= 2])
     table("ALL qualifying coins", rows)
 
     print("Legend: " + ", ".join(f"{lab}={name}" for name, lab, _ in US_EXCHANGES))
+    print("USPERP = US-regulated perp-style future on Coinbase Derivatives")
     print("Y = listed, - = not listed, ? = exchange data unavailable")
 
 
