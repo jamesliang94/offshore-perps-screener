@@ -1,13 +1,48 @@
-Run at Fri Sep 25 14:47:48 UTC 2026
-Loaded  407 assets from Coinbase
-Loaded  671 assets from Kraken
-Loaded   84 assets from Gemini
+Run at Fri Sep 25 15:01:53 UTC 2026
+Loaded   407 assets from Coinbase
+Loaded   671 assets from Kraken
+Loaded    84 assets from Gemini
+Loaded   204 assets from Binance.US
+Loaded   417 assets from Crypto.com
+Loaded   120 assets from Bitstamp
+Loaded   150 assets from Uphold
 
-15 perps with >= $500M 24h volume
+Perp venues scanned: Binance, Bitget, Bybit, OKX
+Threshold: $300M 24h volume on at least one venue
+21 coins qualify
 
-=== NOT listed on Coinbase / Kraken / Gemini ===
-Symbol          Venue                   24h Vol ($M)     OI ($M)   Funding %
+=== NOT listed on any US exchange checked (2) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US   Venues (vol $M)
+SNDK              728      -    -    -    -    -    -    -    0   OKX 728
+SOXL              308      -    -    -    -    -    -    -    0   Bybit 308
 
-=== Listed on SOME US exchanges (partial) ===
-NEARUSDT         missing from: Gemini
-ONDOUSDT         missing from: Gemini
+=== Listed on only 1-2 US exchanges (1) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US   Venues (vol $M)
+SAGA              346      -    Y    -    -    -    -    -    1   Binance 346
+
+=== ALL qualifying coins (21) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US   Venues (vol $M)
+BTC            12,274      Y    Y    Y    Y    Y    Y    Y    7   Binance 12,274, OKX 7,221, Bybit 5,966, Bitget 2,848
+ETH             9,618      Y    Y    Y    Y    Y    Y    Y    7   Binance 9,618, OKX 7,585, Bybit 3,054, Bitget 1,834
+SOL             3,074      Y    Y    Y    Y    Y    Y    -    6   Binance 3,074, OKX 1,602, Bybit 1,221, Bitget 309
+ZEC             2,299      Y    Y    Y    Y    -    Y    -    5   Binance 2,299, OKX 1,608, Bybit 533
+XRP             2,069      Y    Y    Y    Y    Y    Y    -    6   Binance 2,069, OKX 900, Bybit 895, Bitget 341
+NEAR            1,130      Y    Y    -    Y    Y    Y    Y    6   Binance 1,130, Bybit 500, OKX 361
+ONDO              874      Y    Y    -    Y    Y    Y    -    5   Binance 874, OKX 392, Bybit 362
+SUI               752      Y    Y    Y    Y    Y    Y    -    6   Binance 752
+HYPE              749      Y    Y    Y    Y    Y    Y    Y    7   Binance 749
+SNDK              728      -    -    -    -    -    -    -    0   OKX 728
+DOGE              692      Y    Y    Y    Y    Y    Y    Y    7   Binance 692, OKX 488
+UNI               555      Y    Y    Y    Y    Y    Y    -    6   Binance 555
+ENA               487      Y    Y    -    Y    Y    Y    Y    6   Binance 487
+LINK              455      Y    Y    Y    Y    Y    Y    Y    7   Binance 455
+XPL               438      Y    Y    -    -    Y    Y    -    4   Binance 438
+LTC               418      Y    Y    Y    Y    Y    Y    Y    7   Binance 418
+PEPE              375      Y    Y    Y    Y    Y    Y    -    6   Binance 375
+BNB               358      Y    Y    Y    Y    -    Y    Y    6   Binance 358
+SAGA              346      -    Y    -    -    -    -    -    1   Binance 346
+TAO               316      Y    Y    -    -    Y    Y    -    4   Binance 316
+SOXL              308      -    -    -    -    -    -    -    0   Bybit 308
+
+Legend: CB=Coinbase, KRK=Kraken, GEM=Gemini, BUS=Binance.US, CDC=Crypto.com, BSTP=Bitstamp, UPH=Uphold
+Y = listed, - = not listed, ? = exchange data unavailable
