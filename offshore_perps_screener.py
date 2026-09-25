@@ -1,12 +1,12 @@
 """
 Offshore Perps Screener
 -----------------------
-Finds perpetual futures on big offshore exchanges (Binance, Bybit, OKX...)
-with >= MIN_VOLUME_USD 24h volume whose underlying coin is NOT listed on
-US exchanges (Coinbase, Kraken, Gemini).
+Lists every coin with a perpetual future on big offshore venues (Binance,
+Bybit, OKX, Bitget) doing >= MIN_VOLUME_USD in 24h volume, and shows which
+US exchanges list that coin for spot trading.
 
-Data source for perps: CoinGecko's public derivatives endpoint (works from
-the US, unlike Binance's own futures API, which geoblocks US IPs).
+Perp data: CoinGecko public derivatives endpoint (works from the US).
+US listings: each exchange's own public API.
 
 Run:  pip install requests
       python offshore_perps_screener.py
@@ -14,138 +14,184 @@ Run:  pip install requests
 
 import os
 import re
+from collections import defaultdict
+
 import requests
 
-MIN_VOLUME_USD = 500_000_000
+MIN_VOLUME_USD = 300_000_000
 
-# Optional free CoinGecko "Demo" API key (recommended when running on GitHub Actions)
+# Scan any CoinGecko derivatives market whose name contains one of these words
+PERP_VENUE_KEYWORDS = ["binance", "bybit", "okx", "bitget"]
+
+# Optional free CoinGecko "Demo" API key (recommended on GitHub Actions)
 CG_KEY = os.environ.get("COINGECKO_API_KEY", "")
 
-# Which perp venues to scan (as named by CoinGecko). Add or remove freely.
-PERP_MARKETS = {
-    "Binance (Futures)",
-    # "Bybit (Futures)",
-    # "OKX (Futures)",
-    # "Bitget Futures",
-}
-
 TIMEOUT = 30
-HEADERS = {"User-Agent": "perps-screener/1.0"}
+HEADERS = {"User-Agent": "perps-screener/2.0"}
 
-# Exchange-specific tickers that mean the same coin
 ALIASES = {"XBT": "BTC", "XDG": "DOGE", "XXBT": "BTC", "XETH": "ETH"}
+QUOTES = ("FDUSD", "USDT", "USDC", "BUSD", "USD", "EUR", "GBP", "BTC", "ETH")
 
 
 def norm(sym: str) -> str:
-    """Normalize a base symbol: uppercase, strip 1000x/1M multipliers, map aliases."""
-    s = sym.upper().strip()
+    """Uppercase, strip 1000x/1M multipliers, map exchange-specific aliases."""
+    s = (sym or "").upper().strip()
     s = re.sub(r"^(1000000|100000|10000|1000|1M)(?=[A-Z])", "", s)
     return ALIASES.get(s, s)
 
 
-# ---------- US exchange listings ----------
-
-def coinbase_bases() -> set:
-    r = requests.get("https://api.exchange.coinbase.com/products",
-                     headers=HEADERS, timeout=TIMEOUT)
+def get(url, headers=None):
+    r = requests.get(url, headers=headers or HEADERS, timeout=TIMEOUT)
     r.raise_for_status()
-    return {norm(p["base_currency"]) for p in r.json()
+    return r.json()
+
+
+# ---------- US exchange listings (spot) ----------
+
+def coinbase():
+    return {norm(p["base_currency"]) for p in get("https://api.exchange.coinbase.com/products")
             if p.get("status") == "online"}
 
 
-def kraken_bases() -> set:
-    r = requests.get("https://api.kraken.com/0/public/AssetPairs",
-                     headers=HEADERS, timeout=TIMEOUT)
-    r.raise_for_status()
-    bases = set()
-    for pair in r.json()["result"].values():
-        ws = pair.get("wsname")  # e.g. "XBT/USD"
+def kraken():
+    out = set()
+    for pair in get("https://api.kraken.com/0/public/AssetPairs")["result"].values():
+        ws = pair.get("wsname")
         if ws and "/" in ws:
-            bases.add(norm(ws.split("/")[0]))
-    return bases
+            out.add(norm(ws.split("/")[0]))
+    return out
 
 
-def gemini_bases() -> set:
-    r = requests.get("https://api.gemini.com/v1/symbols",
-                     headers=HEADERS, timeout=TIMEOUT)
-    r.raise_for_status()
-    quotes = ("usdt", "usdc", "gusd", "rlusd", "usd", "btc", "eth",
-              "eur", "gbp", "sgd", "dai")
-    bases = set()
-    for s in r.json():
+def gemini():
+    quotes = ("usdt", "usdc", "gusd", "rlusd", "usd", "btc", "eth", "eur", "gbp", "sgd", "dai")
+    out = set()
+    for s in get("https://api.gemini.com/v1/symbols"):
         s = s.lower()
-        if s.endswith("perp"):  # skip Gemini's own perp symbols
+        if s.endswith("perp"):
             continue
         for q in quotes:
             if s.endswith(q) and len(s) > len(q):
-                bases.add(norm(s[: -len(q)]))
+                out.add(norm(s[: -len(q)]))
                 break
-    return bases
+    return out
+
+
+def binance_us():
+    return {norm(s["baseAsset"]) for s in get("https://api.binance.us/api/v3/exchangeInfo")["symbols"]
+            if s.get("status") == "TRADING"}
+
+
+def cryptocom():
+    items = get("https://api.crypto.com/exchange/v1/public/get-instruments").get("result", {}).get("data", [])
+    return {norm(i["base_ccy"]) for i in items
+            if i.get("inst_type") == "CCY_PAIR" and i.get("base_ccy")}
+
+
+def bitstamp():
+    return {norm(p["name"].split("/")[0]) for p in get("https://www.bitstamp.net/api/v2/trading-pairs-info/")
+            if p.get("trading", "Enabled") == "Enabled"}
+
+
+def uphold():
+    return {norm(a["code"]) for a in get("https://api.uphold.com/v0/assets") if a.get("code")}
+
+
+US_EXCHANGES = [  # (name, column label, loader)
+    ("Coinbase", "CB", coinbase),
+    ("Kraken", "KRK", kraken),
+    ("Gemini", "GEM", gemini),
+    ("Binance.US", "BUS", binance_us),
+    ("Crypto.com", "CDC", cryptocom),
+    ("Bitstamp", "BSTP", bitstamp),
+    ("Uphold", "UPH", uphold),
+]
 
 
 # ---------- Offshore perps ----------
 
-def offshore_perps() -> list:
-    cg_headers = dict(HEADERS)
+def base_from(t):
+    if t.get("index_id"):
+        return norm(t["index_id"])
+    sym = (t.get("symbol") or "").upper().replace("-", "").replace("_PERP", "").replace("SWAP", "")
+    for q in QUOTES:
+        if sym.endswith(q) and len(sym) > len(q):
+            return norm(sym[: -len(q)])
+    return norm(sym)
+
+
+def offshore_perps():
+    h = dict(HEADERS)
     if CG_KEY:
-        cg_headers["x-cg-demo-api-key"] = CG_KEY
-    r = requests.get("https://api.coingecko.com/api/v3/derivatives",
-                     headers=cg_headers, timeout=TIMEOUT)
-    r.raise_for_status()
-    rows = []
-    for t in r.json():
-        if t.get("market") not in PERP_MARKETS:
+        h["x-cg-demo-api-key"] = CG_KEY
+    coins = defaultdict(dict)  # base -> {venue: best volume}
+    venues_seen = set()
+    for t in get("https://api.coingecko.com/api/v3/derivatives", h):
+        market = t.get("market") or ""
+        if not any(k in market.lower() for k in PERP_VENUE_KEYWORDS):
             continue
         if t.get("contract_type") != "perpetual":
             continue
+        venue = market.split(" (")[0].replace(" Futures", "")
+        venues_seen.add(venue)
         vol = float(t.get("volume_24h") or 0)
         if vol < MIN_VOLUME_USD:
             continue
-        base = norm(t.get("index_id") or t.get("symbol", ""))
-        rows.append({
-            "market": t["market"],
-            "symbol": t.get("symbol"),
-            "base": base,
-            "volume_24h": vol,
-            "funding": t.get("funding_rate"),
-            "open_interest": t.get("open_interest"),
-        })
-    return rows
+        base = base_from(t)
+        coins[base][venue] = max(vol, coins[base].get(venue, 0))
+    return coins, venues_seen
 
+
+# ---------- Report ----------
 
 def main():
-    us = {}
-    for name, fn in [("Coinbase", coinbase_bases),
-                     ("Kraken", kraken_bases),
-                     ("Gemini", gemini_bases)]:
+    us, failed = {}, []
+    for name, label, fn in US_EXCHANGES:
         try:
-            us[name] = fn()
-            print(f"Loaded {len(us[name]):>4} assets from {name}")
+            us[label] = fn()
+            print(f"Loaded {len(us[label]):>5} assets from {name}")
         except Exception as e:
+            us[label] = None
+            failed.append(name)
             print(f"WARNING: couldn't load {name}: {e}")
-            us[name] = set()
-    us_all = set().union(*us.values())
 
-    perps = offshore_perps()
-    print(f"\n{len(perps)} perps with >= ${MIN_VOLUME_USD/1e6:.0f}M 24h volume\n")
+    coins, venues_seen = offshore_perps()
+    print(f"\nPerp venues scanned: {', '.join(sorted(venues_seen)) or 'none found'}")
+    print(f"Threshold: ${MIN_VOLUME_USD/1e6:,.0f}M 24h volume on at least one venue")
+    print(f"{len(coins)} coins qualify\n")
+    if failed:
+        print(f"NOTE: {', '.join(failed)} failed to load ('?' below), so 'not listed' results may be incomplete.\n")
 
-    not_in_us = [p for p in perps if p["base"] not in us_all]
-    not_in_us.sort(key=lambda p: p["volume_24h"], reverse=True)
+    labels = [lab for _, lab, _ in US_EXCHANGES]
+    rows = []
+    for base, venues in coins.items():
+        flags = {lab: ("?" if us[lab] is None else ("Y" if base in us[lab] else "-")) for lab in labels}
+        rows.append({
+            "base": base,
+            "top_vol": max(venues.values()),
+            "venues": ", ".join(f"{v} {vol/1e6:,.0f}" for v, vol in sorted(venues.items(), key=lambda x: -x[1])),
+            "flags": flags,
+            "us_count": sum(f == "Y" for f in flags.values()),
+        })
+    rows.sort(key=lambda r: r["top_vol"], reverse=True)
 
-    print("=== NOT listed on Coinbase / Kraken / Gemini ===")
-    print(f"{'Symbol':<16}{'Venue':<22}{'24h Vol ($M)':>14}{'OI ($M)':>12}{'Funding %':>12}")
-    for p in not_in_us:
-        oi = f"{p['open_interest']/1e6:,.0f}" if p["open_interest"] else "-"
-        fr = f"{p['funding']:.4f}" if p["funding"] is not None else "-"
-        print(f"{p['symbol']:<16}{p['market']:<22}{p['volume_24h']/1e6:>14,.0f}{oi:>12}{fr:>12}")
+    def table(title, subset):
+        print(f"=== {title} ({len(subset)}) ===")
+        if not subset:
+            print("(none)\n")
+            return
+        print(f"{'Coin':<10}{'Top vol $M':>11}  " + "".join(f"{l:>5}" for l in labels) + f"{'#US':>5}   Venues (vol $M)")
+        for r in subset:
+            print(f"{r['base']:<10}{r['top_vol']/1e6:>11,.0f}  "
+                  + "".join(f"{r['flags'][l]:>5}" for l in labels)
+                  + f"{r['us_count']:>5}   {r['venues']}")
+        print()
 
-    # Bonus: coins listed on some US venues but not all
-    print("\n=== Listed on SOME US exchanges (partial) ===")
-    for p in sorted(perps, key=lambda p: p["volume_24h"], reverse=True):
-        if p["base"] in us_all:
-            missing = [n for n, s in us.items() if p["base"] not in s]
-            if missing:
-                print(f"{p['symbol']:<16} missing from: {', '.join(missing)}")
+    table("NOT listed on any US exchange checked", [r for r in rows if r["us_count"] == 0])
+    table("Listed on only 1-2 US exchanges", [r for r in rows if 1 <= r["us_count"] <= 2])
+    table("ALL qualifying coins", rows)
+
+    print("Legend: " + ", ".join(f"{lab}={name}" for name, lab, _ in US_EXCHANGES))
+    print("Y = listed, - = not listed, ? = exchange data unavailable")
 
 
 if __name__ == "__main__":
