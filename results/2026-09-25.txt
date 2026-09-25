@@ -1,0 +1,13 @@
+Run at Fri Sep 25 14:47:48 UTC 2026
+Loaded  407 assets from Coinbase
+Loaded  671 assets from Kraken
+Loaded   84 assets from Gemini
+
+15 perps with >= $500M 24h volume
+
+=== NOT listed on Coinbase / Kraken / Gemini ===
+Symbol          Venue                   24h Vol ($M)     OI ($M)   Funding %
+
+=== Listed on SOME US exchanges (partial) ===
+NEARUSDT         missing from: Gemini
+ONDOUSDT         missing from: Gemini
