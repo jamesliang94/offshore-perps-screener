@@ -23,6 +23,9 @@ MIN_VOLUME_USD = 300_000_000
 # Scan any CoinGecko derivatives market whose name contains one of these words
 PERP_VENUE_KEYWORDS = ["binance", "bybit", "okx", "bitget"]
 
+# Coins to print a detailed diagnostic for, whether or not they qualify
+WATCHLIST = ["ZEC"]
+
 # Optional free CoinGecko "Demo" API key (recommended on GitHub Actions)
 CG_KEY = os.environ.get("COINGECKO_API_KEY", "")
 
@@ -31,6 +34,9 @@ HEADERS = {"User-Agent": "perps-screener/2.0"}
 
 ALIASES = {"XBT": "BTC", "XDG": "DOGE", "XXBT": "BTC", "XETH": "ETH"}
 QUOTES = ("FDUSD", "USDT", "USDC", "BUSD", "USD", "EUR", "GBP", "BTC", "ETH")
+
+
+DIAG = {}
 
 
 def norm(sym: str) -> str:
@@ -103,8 +109,16 @@ def coinbase_us_perps():
                "?product_type=FUTURE&limit=1000")
     out = set()
     now_year = datetime.now(timezone.utc).year
-    for prod in data.get("products", []):
+    products = data.get("products", [])
+    DIAG["cb_futures_total"] = len(products)
+    for prod in products:
         d = prod.get("future_product_details") or {}
+        blob = str(prod).upper()
+        for w in WATCHLIST:
+            if w in blob:
+                DIAG.setdefault("cb_watch", []).append(
+                    f"{prod.get('product_id')} | {d.get('display_name') or prod.get('display_name')} | "
+                    f"venue={d.get('venue')} root={d.get('contract_root_unit')} expiry={d.get('contract_expiry')}")
         if (d.get("venue") or "").lower() not in ("cde", ""):
             continue
         name = (d.get("display_name") or prod.get("display_name") or "").upper()
@@ -157,9 +171,12 @@ def offshore_perps():
         venue = market.split(" (")[0].replace(" Futures", "")
         venues_seen.add(venue)
         vol = float(t.get("volume_24h") or 0)
+        base = base_from(t)
+        if base in WATCHLIST or any(w in (t.get("symbol") or "").upper() for w in WATCHLIST):
+            DIAG.setdefault("cg_watch", []).append(
+                f"{market} | {t.get('symbol')} | index_id={t.get('index_id')} -> {base} | vol ${vol/1e6:,.0f}M")
         if vol < MIN_VOLUME_USD:
             continue
-        base = base_from(t)
         coins[base][venue] = max(vol, coins[base].get(venue, 0))
     return coins, venues_seen
 
@@ -223,6 +240,21 @@ def main():
     table("ALL qualifying coins", rows)
 
     print("Legend: " + ", ".join(f"{lab}={name}" for name, lab, _ in US_EXCHANGES))
+    print("\n=== DIAGNOSTICS ===")
+    print(f"Coinbase futures products returned: {DIAG.get('cb_futures_total', 'n/a')}")
+    for w in WATCHLIST:
+        print(f"\n-- {w} --")
+        print("Offshore perps seen (any volume):")
+        for line in [l for l in DIAG.get("cg_watch", []) if w in l.upper()] or ["  none found in CoinGecko data"]:
+            print("  " + line)
+        print("Coinbase futures products mentioning it:")
+        for line in [l for l in DIAG.get("cb_watch", []) if w in l.upper()] or ["  none found"]:
+            print("  " + line)
+        print("Spot listings: " + ", ".join(
+            f"{lab}={'?' if us[lab] is None else ('Y' if w in us[lab] else '-')}" for lab in labels))
+        print(f"Qualifies (>= threshold): {'yes' if w in coins else 'no'} | "
+              f"USPERP: {'?' if us_perps is None else ('Y' if w in us_perps else '-')}")
+    print()
     print("USPERP = US-regulated perp-style future on Coinbase Derivatives")
     print("Y = listed, - = not listed, ? = exchange data unavailable")
 
