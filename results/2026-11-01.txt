@@ -1,0 +1,54 @@
+Run at Sun Nov  1 18:12:26 UTC 2026
+Loaded   410 assets from Coinbase
+Loaded   682 assets from Kraken
+Loaded    85 assets from Gemini
+Loaded   204 assets from Binance.US
+Loaded   409 assets from Crypto.com
+Loaded   116 assets from Bitstamp
+Loaded   150 assets from Uphold
+Loaded    29 coins with US perp-style futures (Coinbase Derivatives)
+
+Perp venues scanned: Binance, Bitget, Bybit, OKX
+Threshold: $300M 24h volume on at least one venue
+7 coins qualify
+
+=== NO US perp-style futures (offshore-only perps) (1) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+ESPORTS           593      -    Y    -    -    -    -    -    1       -   Binance 593
+
+=== NOT listed on any US exchange checked (spot) (0) ===
+(none)
+
+=== Listed on only 1-2 US exchanges (1) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+ESPORTS           593      -    Y    -    -    -    -    -    1       -   Binance 593
+
+=== ALL qualifying coins (7) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+BTC             3,740      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 3,740, OKX 1,885, Bybit 1,259, Bitget 689
+ETH             2,555      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 2,555, OKX 1,980, Bybit 603, Bitget 452
+ZEC               755      Y    Y    Y    Y    -    Y    -    5       Y   Binance 755, OKX 538
+SOL               640      Y    Y    Y    Y    Y    Y    -    6       Y   Binance 640, OKX 367
+ESPORTS           593      -    Y    -    -    -    -    -    1       -   Binance 593
+HYPE              364      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 364
+BNB               319      Y    Y    Y    Y    -    Y    Y    6       Y   Binance 319
+
+Legend: CB=Coinbase, KRK=Kraken, GEM=Gemini, BUS=Binance.US, CDC=Crypto.com, BSTP=Bitstamp, UPH=Uphold
+
+=== DIAGNOSTICS ===
+Coinbase futures products returned: 100
+
+-- ZEC --
+Offshore perps seen (any volume):
+  Binance (Futures) | ZECUSDT | index_id=ZEC -> ZEC | vol $755M
+  Bybit (Futures) | ZECUSDT | index_id=ZEC -> ZEC | vol $123M
+  OKX (Futures) | ZEC-USDT-SWAP | index_id=ZEC -> ZEC | vol $538M
+  Bitget Futures | ZECUSDT_UMCBL | index_id=ZEC -> ZEC | vol $66M
+  Binance (Futures) | ZECUSDC | index_id=ZEC -> ZEC | vol $50M
+Coinbase futures products mentioning it:
+  ZEC-20DEC30-CDE | Zcash Perpetual | venue=cde root=ZEC expiry=2089-12-30T16:00:00Z
+Spot listings: CB=Y, KRK=Y, GEM=Y, BUS=Y, CDC=-, BSTP=Y, UPH=-
+Qualifies (>= threshold): yes | USPERP: Y
+
+USPERP = US-regulated perp-style future on Coinbase Derivatives
+Y = listed, - = not listed, ? = exchange data unavailable
