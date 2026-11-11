@@ -1,0 +1,110 @@
+Run at Wed Nov 11 19:56:14 UTC 2026
+Loaded   408 assets from Coinbase
+Loaded   662 assets from Kraken
+Loaded    85 assets from Gemini
+Loaded   204 assets from Binance.US
+Loaded   404 assets from Crypto.com
+Loaded   117 assets from Bitstamp
+Loaded   150 assets from Uphold
+Loaded    29 coins with US perp-style futures (Coinbase Derivatives)
+
+Perp venues scanned: Binance, Bitget, Bybit, OKX
+Threshold: $300M 24h volume on at least one venue
+27 coins qualify
+
+=== NO US perp-style futures (offshore-only perps) (19) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+SOXL            5,548      -    -    -    -    -    -    -    0       -   Binance 5,548, OKX 1,531, Bitget 919, Bybit 840
+SNDK            2,865      -    -    -    -    -    -    -    0       -   Binance 2,865, OKX 1,724
+XAU             1,519      -    -    -    -    -    -    -    0       -   Binance 1,519
+SKHYNIX         1,369      -    -    -    -    -    -    -    0       -   Binance 1,369
+NVDA            1,208      -    -    -    -    -    -    -    0       -   Binance 1,208
+MU                996      -    -    -    -    -    -    -    0       -   Binance 996
+INIT              979      -    Y    -    -    Y    -    -    2       -   Binance 979
+SOXS              892      -    -    -    -    -    -    -    0       -   Binance 892
+SPCX              837      -    -    -    -    -    -    -    0       -   Binance 837
+KORU              725      -    -    -    -    -    -    -    0       -   Binance 725
+CL                667      -    -    -    -    -    -    -    0       -   Binance 667
+AGT               531      -    -    -    -    -    -    -    0       -   Binance 531
+SKHY              514      -    -    -    -    -    -    -    0       -   Binance 514
+XAG               512      -    -    -    -    -    -    -    0       -   Binance 512
+SNXX              473      -    -    -    -    -    -    -    0       -   Binance 473
+BZ                465      -    -    -    -    -    -    -    0       -   Binance 465
+JCT               447      -    -    -    -    -    -    -    0       -   Binance 447
+ARIA              327      -    -    -    -    -    -    -    0       -   Binance 327
+QQQ               314      -    -    -    -    -    -    -    0       -   Binance 314
+
+=== NOT listed on any US exchange checked (spot) (18) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+SOXL            5,548      -    -    -    -    -    -    -    0       -   Binance 5,548, OKX 1,531, Bitget 919, Bybit 840
+SNDK            2,865      -    -    -    -    -    -    -    0       -   Binance 2,865, OKX 1,724
+XAU             1,519      -    -    -    -    -    -    -    0       -   Binance 1,519
+SKHYNIX         1,369      -    -    -    -    -    -    -    0       -   Binance 1,369
+NVDA            1,208      -    -    -    -    -    -    -    0       -   Binance 1,208
+MU                996      -    -    -    -    -    -    -    0       -   Binance 996
+SOXS              892      -    -    -    -    -    -    -    0       -   Binance 892
+SPCX              837      -    -    -    -    -    -    -    0       -   Binance 837
+KORU              725      -    -    -    -    -    -    -    0       -   Binance 725
+CL                667      -    -    -    -    -    -    -    0       -   Binance 667
+AGT               531      -    -    -    -    -    -    -    0       -   Binance 531
+SKHY              514      -    -    -    -    -    -    -    0       -   Binance 514
+XAG               512      -    -    -    -    -    -    -    0       -   Binance 512
+SNXX              473      -    -    -    -    -    -    -    0       -   Binance 473
+BZ                465      -    -    -    -    -    -    -    0       -   Binance 465
+JCT               447      -    -    -    -    -    -    -    0       -   Binance 447
+ARIA              327      -    -    -    -    -    -    -    0       -   Binance 327
+QQQ               314      -    -    -    -    -    -    -    0       -   Binance 314
+
+=== Listed on only 1-2 US exchanges (1) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+INIT              979      -    Y    -    -    Y    -    -    2       -   Binance 979
+
+=== ALL qualifying coins (27) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+BTC             8,890      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 8,890, OKX 4,898, Bybit 3,490, Bitget 2,218
+ETH             5,821      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 5,821, OKX 4,484, Bybit 1,662, Bitget 1,014
+SOXL            5,548      -    -    -    -    -    -    -    0       -   Binance 5,548, OKX 1,531, Bitget 919, Bybit 840
+SNDK            2,865      -    -    -    -    -    -    -    0       -   Binance 2,865, OKX 1,724
+ZEC             2,548      Y    Y    Y    Y    -    Y    -    5       Y   Binance 2,548, OKX 1,729, Bybit 536
+XAU             1,519      -    -    -    -    -    -    -    0       -   Binance 1,519
+SKHYNIX         1,369      -    -    -    -    -    -    -    0       -   Binance 1,369
+NVDA            1,208      -    -    -    -    -    -    -    0       -   Binance 1,208
+SOL             1,149      Y    Y    Y    Y    Y    Y    -    6       Y   Binance 1,149, OKX 623, Bybit 390
+MU                996      -    -    -    -    -    -    -    0       -   Binance 996
+INIT              979      -    Y    -    -    Y    -    -    2       -   Binance 979
+SOXS              892      -    -    -    -    -    -    -    0       -   Binance 892
+SPCX              837      -    -    -    -    -    -    -    0       -   Binance 837
+KORU              725      -    -    -    -    -    -    -    0       -   Binance 725
+CL                667      -    -    -    -    -    -    -    0       -   Binance 667
+XRP               550      Y    Y    Y    Y    Y    Y    -    6       Y   Binance 550
+AGT               531      -    -    -    -    -    -    -    0       -   Binance 531
+SKHY              514      -    -    -    -    -    -    -    0       -   Binance 514
+XAG               512      -    -    -    -    -    -    -    0       -   Binance 512
+PEPE              490      Y    Y    Y    Y    Y    Y    -    6       Y   Binance 490, OKX 325
+SNXX              473      -    -    -    -    -    -    -    0       -   Binance 473
+BZ                465      -    -    -    -    -    -    -    0       -   Binance 465
+JCT               447      -    -    -    -    -    -    -    0       -   Binance 447
+HYPE              413      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 413
+NEAR              396      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 396
+ARIA              327      -    -    -    -    -    -    -    0       -   Binance 327
+QQQ               314      -    -    -    -    -    -    -    0       -   Binance 314
+
+Legend: CB=Coinbase, KRK=Kraken, GEM=Gemini, BUS=Binance.US, CDC=Crypto.com, BSTP=Bitstamp, UPH=Uphold
+
+=== DIAGNOSTICS ===
+Coinbase futures products returned: 100
+
+-- ZEC --
+Offshore perps seen (any volume):
+  Binance (Futures) | ZECUSDT | index_id=ZEC -> ZEC | vol $2,548M
+  OKX (Futures) | ZEC-USDT-SWAP | index_id=ZEC -> ZEC | vol $1,729M
+  Bybit (Futures) | ZECUSDT | index_id=ZEC -> ZEC | vol $536M
+  Bitget Futures | ZECUSDT_UMCBL | index_id=ZEC -> ZEC | vol $228M
+  Binance (Futures) | ZECUSDC | index_id=ZEC -> ZEC | vol $139M
+Coinbase futures products mentioning it:
+  ZEC-20DEC30-CDE | Zcash Perpetual | venue=cde root=ZEC expiry=2089-12-30T16:00:00Z
+Spot listings: CB=Y, KRK=Y, GEM=Y, BUS=Y, CDC=-, BSTP=Y, UPH=-
+Qualifies (>= threshold): yes | USPERP: Y
+
+USPERP = US-regulated perp-style future on Coinbase Derivatives
+Y = listed, - = not listed, ? = exchange data unavailable
