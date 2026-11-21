@@ -1,0 +1,70 @@
+Run at Sat Nov 21 19:53:28 UTC 2026
+Loaded   405 assets from Coinbase
+Loaded   666 assets from Kraken
+Loaded    85 assets from Gemini
+Loaded   204 assets from Binance.US
+Loaded   401 assets from Crypto.com
+Loaded   117 assets from Bitstamp
+Loaded   150 assets from Uphold
+Loaded    29 coins with US perp-style futures (Coinbase Derivatives)
+
+Perp venues scanned: Binance, Bitget, Bybit, OKX
+Threshold: $300M 24h volume on at least one venue
+15 coins qualify
+
+=== NO US perp-style futures (offshore-only perps) (7) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+SOXL            2,529      -    -    -    -    -    -    -    0       -   Binance 2,529
+XAU               971      -    -    -    -    -    -    -    0       -   Binance 971
+NVDA              963      -    -    -    -    -    -    -    0       -   Binance 963
+SPCX              435      -    -    -    -    -    -    -    0       -   Binance 435
+XAG               386      -    -    -    -    -    -    -    0       -   Binance 386
+ANT               355      -    -    -    -    -    -    -    0       -   Binance 355
+SKHYNIX           308      -    -    -    -    -    -    -    0       -   Binance 308
+
+=== NOT listed on any US exchange checked (spot) (7) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+SOXL            2,529      -    -    -    -    -    -    -    0       -   Binance 2,529
+XAU               971      -    -    -    -    -    -    -    0       -   Binance 971
+NVDA              963      -    -    -    -    -    -    -    0       -   Binance 963
+SPCX              435      -    -    -    -    -    -    -    0       -   Binance 435
+XAG               386      -    -    -    -    -    -    -    0       -   Binance 386
+ANT               355      -    -    -    -    -    -    -    0       -   Binance 355
+SKHYNIX           308      -    -    -    -    -    -    -    0       -   Binance 308
+
+=== Listed on only 1-2 US exchanges (0) ===
+(none)
+
+=== ALL qualifying coins (15) ===
+Coin       Top vol $M     CB  KRK  GEM  BUS  CDC BSTP  UPH  #US  USPERP   Venues (vol $M)
+BTC            23,225      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 23,225, OKX 13,477, Bybit 9,217, Bitget 5,279
+ETH            11,917      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 11,917, OKX 8,915, Bybit 2,977, Bitget 2,381
+SOXL            2,529      -    -    -    -    -    -    -    0       -   Binance 2,529
+ZEC             2,443      Y    Y    Y    Y    -    Y    -    5       Y   Binance 2,443
+SOL             2,292      Y    Y    Y    Y    Y    Y    -    6       Y   Binance 2,292, OKX 1,084, Bybit 619
+XAU               971      -    -    -    -    -    -    -    0       -   Binance 971
+NVDA              963      -    -    -    -    -    -    -    0       -   Binance 963
+XRP               890      Y    Y    Y    Y    Y    Y    -    6       Y   Binance 890
+HYPE              741      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 741
+BNB               571      Y    Y    Y    Y    -    Y    Y    6       Y   Binance 571
+NEAR              536      Y    Y    Y    Y    Y    Y    Y    7       Y   Binance 536
+SPCX              435      -    -    -    -    -    -    -    0       -   Binance 435
+XAG               386      -    -    -    -    -    -    -    0       -   Binance 386
+ANT               355      -    -    -    -    -    -    -    0       -   Binance 355
+SKHYNIX           308      -    -    -    -    -    -    -    0       -   Binance 308
+
+Legend: CB=Coinbase, KRK=Kraken, GEM=Gemini, BUS=Binance.US, CDC=Crypto.com, BSTP=Bitstamp, UPH=Uphold
+
+=== DIAGNOSTICS ===
+Coinbase futures products returned: 119
+
+-- ZEC --
+Offshore perps seen (any volume):
+  Binance (Futures) | ZECUSDT | index_id=ZEC -> ZEC | vol $2,443M
+Coinbase futures products mentioning it:
+  ZEC-20DEC30-CDE | Zcash Perpetual | venue=cde root=ZEC expiry=2089-12-30T16:00:00Z
+Spot listings: CB=Y, KRK=Y, GEM=Y, BUS=Y, CDC=-, BSTP=Y, UPH=-
+Qualifies (>= threshold): yes | USPERP: Y
+
+USPERP = US-regulated perp-style future on Coinbase Derivatives
+Y = listed, - = not listed, ? = exchange data unavailable
